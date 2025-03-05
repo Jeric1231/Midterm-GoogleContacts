@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contacts</title>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        .display-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .table-div {
+            display: table;
+            width: 80%;
+            max-width: 768px;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table-row {
+            display: table-row;
+            text-align: center;
+        }
+        .divCell {
+            display: table-cell;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            align-content: center;
+        }
+    
+        .divCell-actions{
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            align-items: center;
+            height: 100%;
+            gap: 10px;
+        }
+        .header {
+            font-weight: bold;
+            background-color: #4CAF50;
+            color: white;
+        }
+        .div-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 80%;
+            max-width: 768px;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .create-btn, .addSubmit {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            height: 48px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .create-btn:hover, .addSubmit:hover {
+            background-color: #45a049;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Add some space between the buttons */
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 24px;
+            height: auto;
+            width: 90%;
+            max-width: 512px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h1{
+            margin-left: 130px;
+        }
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 48px;
+            margin: 12px 0;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            height: 24px;
+            width: 256px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            padding: 6px;
+            border-radius: 4px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .actionBtn {
+            background-color: #4CAF50;
+            color: white;
+            width: 100px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .actionBtn:hover {
+            background-color: #45a049;
+        }
+        .actionBtn img {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+        .logout-container {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 768px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="display-container">
+        <div class="div-header">
+            <h1>Your Contacts</h1>
+            <button class="create-btn" onclick="openModal('addContactModal')">Add New Contact</button>
+        </div>
+
+        <div class="table-div">
+            <div class="table-row header">
+                <div class="divCell"></div>
+                <div class="divCell">Name</div>
+                <div class="divCell">Email</div>
+                <div class="divCell">Phone Number</div>
+                <div class="divCell">Actions</div>
+            </div>
+            <div th:each="contact : ${contacts}" class="table-row">
+                <div class="divCell"><img th:src="${contact['profilePicture']}" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%;"></div>
+                <div class="divCell"><p th:text="${contact['name']}"></p></div>
+                <div class="divCell"><p th:text="${contact['email']}"></p></div>
+                <div class="divCell"><p th:text="${contact['phone']}"></p></div>
+                <div class="divCell-actions">
+                    <button class="actionBtn" th:attr="onclick=|updateModal('${contact['resourceName']}', '${contact['name']}', '${contact['email']}', '${contact['phone']}', '${contact['profilePicture']}')|">Update</button>
+                    <form th:action="@{/delete-contact}" method="post">
+                        <input type="hidden" name="resourceName" th:value="${contact['resourceName']}">
+                        <button class="actionBtn" type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="logout-container">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="create-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addContactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Add New Contact</h1>
+                <span class="close" onclick="closeModal('addContactModal')">&times;</span>
+            </div>
+            <form th:action="@{/create-contact}" method="post">
+                <div class="form-group">
+                    <label for="addName">Name:</label>
+                    <input type="text" id="addName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="addEmail">Email:</label>
+                    <input type="email" id="addEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="addPhone">Phone Number:</label>
+                    <input type="tel" id="addPhone" name="phone" pattern="\d{11}" title="Phone number must be 11 digits" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="addSubmit">Add Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="updateContactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Update Contact</h1>
+                <span class="close" onclick="closeModal('updateContactModal')">&times;</span>
+            </div>
+            <form th:action="@{/update-contact}" method="post">
+                <input type="hidden" name="resourceName" id="updateResourceName">
+                <div class="form-group">
+                    <label for="updateName">Name:</label>
+                    <input type="text" id="updateName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="updateEmail">Email:</label>
+                    <input type="email" id="updateEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="updatePhone">Phone Number:</label>
+                    <input type="tel" id="updatePhone" name="phone" pattern="\d{11}" title="Phone number must be 11 digits" required>
+                </div>
+                <div class="form-group">
+                    <label for="updateProfilePicture">Profile Picture URL:</label>
+                    <input type="url" id="updateProfilePicture" name="profilePicture" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="addSubmit">Update Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId){
+            document.getElementById(modalId).style.display = "flex";
+        }
+        function closeModal(modalId){
+            document.getElementById(modalId).style.display = "none";
+        }
+        function updateModal(resourceName, name, email, phone, profilePicture){
+            document.getElementById('updateResourceName').value = resourceName;
+            document.getElementById('updateName').value = name;
+            document.getElementById('updateEmail').value = email;
+            document.getElementById('updatePhone').value = phone;
+            document.getElementById('updateProfilePicture').value = profilePicture;
+            openModal('updateContactModal');
+        }
+    </script>
+</body>
+</html>
