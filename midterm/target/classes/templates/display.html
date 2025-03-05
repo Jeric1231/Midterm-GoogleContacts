@@ -134,6 +134,8 @@
         .modal-footer {
             display: flex;
             justify-content: flex-end;
+            gap: 10px;
+            margin-top: 35px;
         }
         .actionBtn {
             background-color: #4CAF50;
@@ -164,6 +166,61 @@
             display: flex;
             justify-content: center;
         }
+        .deleteBtn {
+            background-color: #f44336; /* Red background */
+            color: white;
+            width: 100px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .deleteBtn:hover {
+            background-color: #d32f2f; /* Darker red on hover */
+        }
+        .cancelBtn {
+            background-color: #ccc; /* Gray background */
+            color: black;
+            width: 100px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .cancelBtn:hover {
+            background-color: #bbb; /* Darker gray on hover */
+        }
+        .confirmDeleteBtn {
+            background-color: #f44336; /* Red background */
+            color: white;
+            width: 100px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .confirmDeleteBtn:hover {
+            background-color: #d32f2f; /* Darker red on hover */
+        }
+
+        .modal-content p{
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
@@ -186,13 +243,9 @@
                 <div class="divCell"><p th:text="${contact['name']}"></p></div>
                 <div class="divCell"><p th:text="${contact['email']}"></p></div>
                 <div class="divCell"><p th:text="${contact['phone']}"></p></div>
-                <div class="divCell-actions">
+                <div class="divCell-actions">   
                     <button class="actionBtn" th:attr="onclick=|updateModal('${contact['resourceName']}', '${contact['name']}', '${contact['email']}', '${contact['phone']}', '${contact['profilePicture']}')|">Update</button>
-                    <form th:action="@{/delete-contact}" method="post">
-                        <input type="hidden" name="resourceName" th:value="${contact['resourceName']}">
-                        <button class="actionBtn" type="submit">Delete</button>
-                    </form>
-                </div>
+                    <button class="deleteBtn" th:attr="onclick=|openDeleteModal('${contact['resourceName']}')|">Delete</button>                </div>
             </div>
         </div>
 
@@ -260,6 +313,23 @@
         </div>
     </div>
 
+    <div id="deleteContactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Confirm Delete</h1>
+                <span class="close" onclick="closeModal('deleteContactModal')">&times;</span>
+            </div>
+            <form th:action="@{/delete-contact}" method="post">
+                <input type="hidden" name="resourceName" id="deleteResourceName">
+                <p>Are you sure you want to delete this contact?</p>
+                <div class="modal-footer">
+                    <button type="button" class="cancelBtn" onclick="closeModal('deleteContactModal')">Cancel</button>
+                    <button type="submit" class="confirmDeleteBtn">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         function openModal(modalId){
             document.getElementById(modalId).style.display = "flex";
@@ -274,6 +344,10 @@
             document.getElementById('updatePhone').value = phone;
             document.getElementById('updateProfilePicture').value = profilePicture;
             openModal('updateContactModal');
+        }
+        function openDeleteModal(resourceName){
+            document.getElementById('deleteResourceName').value = resourceName;
+            openModal('deleteContactModal');
         }
     </script>
 </body>
