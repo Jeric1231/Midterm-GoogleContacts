@@ -28,6 +28,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             overflow: hidden;
+            height: 400px;
+            overflow-y: auto;
         }
         .table-row {
             display: table-row;
@@ -44,9 +46,8 @@
             padding: 10px;
             display: flex;
             justify-content: center;
-            margin-top: 20px;
             align-items: center;
-            height: 100%;
+            height: 80%;
             gap: 10px;
         }
         .header {
@@ -302,10 +303,6 @@
                     <label for="updatePhone">Phone Number:</label>
                     <input type="tel" id="updatePhone" name="phone" pattern="\d{11}" title="Phone number must be 11 digits" required>
                 </div>
-                <div class="form-group">
-                    <label for="updateProfilePicture">Profile Picture URL:</label>
-                    <input type="url" id="updateProfilePicture" name="profilePicture" required>
-                </div>
                 <div class="modal-footer">
                     <button type="submit" class="addSubmit">Update Contact</button>
                 </div>
@@ -342,7 +339,6 @@
             document.getElementById('updateName').value = name;
             document.getElementById('updateEmail').value = email;
             document.getElementById('updatePhone').value = phone;
-            document.getElementById('updateProfilePicture').value = profilePicture;
             openModal('updateContactModal');
         }
         function openDeleteModal(resourceName){
